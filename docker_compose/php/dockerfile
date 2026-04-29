@@ -1,0 +1,84 @@
+# Stage 1: Build stage
+FROM php:8.4-fpm AS build
+
+WORKDIR /app
+
+# Stage 2: Runtime container
+FROM php:8.4-fpm
+
+# Arguments defined in docker-compose.yml
+ARG user
+ARG uid
+
+# Install system dependencies
+RUN apt-get update &&  apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    libpq-dev \
+    npm \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libwebp-dev \
+    jpegoptim optipng pngquant gifsicle \
+    libmagickwand-dev --no-install-recommends
+
+# Install Imagick extension
+RUN pecl install imagick \
+    && docker-php-ext-enable imagick
+
+# Install Node
+# RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+#     && apt-get install -y nodejs
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath
+
+# install PostgresSQL
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pgsql pdo pdo_mysql pdo_pgsql
+
+# Get latest Composer
+COPY --from=composer:2.5.7 /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html/laravel-test-api
+
+
+# Copy File PHP
+COPY ./docker_compose/nginx/custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
+
+# Create system user to run Composer and Artisan Commands
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
+
+# Stage Build
+COPY --from=build /app /var/www/html
+
+# RUN chown -R www-data:www-data /var/www/html/
+RUN find /var/www/html -type d -exec chmod 775 {} \; && \
+find /var/www/html -type f -exec chmod 664 {} \;
+
+COPY --chown=$user:$user . /var/www/html/laravel-test-api
+WORKDIR /var/www/html/laravel-test-api
+
+# RUN php artisan cache:clear && \
+# php artisan config:clear && \
+# php artisan optimize:clear
+
+# RUN composer dump-autoload
+
+#RUN find public/build -type d -exec chmod 775 {} \; && \
+#find public/build -type f -exec chmod 664 {} \;
+
+USER $user
+CMD ["php-fpm", "-F"]
+EXPOSE 9000

@@ -1,0 +1,38 @@
+# version: '3.8'
+services:
+  laravel-test-api:
+    build:
+      args:
+        user: laravel-test-api
+        uid: 1000
+      context: .
+      dockerfile: ./docker_compose/php/dockerfile
+    image: laravel-test-api
+    container_name: laravel-test-api
+    restart: unless-stopped
+    working_dir: /var/www/html/laravel-test-api
+    command: ''
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./:/var/www/html/laravel-test-api
+    expose:
+      - "9000"
+    networks:
+      - laravel-test-api
+
+  nginx:
+    image: nginx:alpine
+    container_name: laravel-test-api-nginx
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html/laravel-test-api
+      - ./docker_compose/nginx:/etc/nginx/conf.d
+    networks:
+      - laravel-test-api
+    ports: # inactive before push to branch
+      - 8011:80
+
+networks:
+  laravel-test-api:
+    driver: bridge
