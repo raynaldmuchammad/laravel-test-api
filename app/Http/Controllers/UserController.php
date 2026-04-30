@@ -15,10 +15,6 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $perPage = (int) $request->query('per_page', 10);
-        if ($perPage < 10) {
-            $perPage = 10;
-        }
-        // Optional upper bound to prevent excessive results
         $perPage = min($perPage, 100);
 
         $sortBy = $request->query('sort_by', 'created_at');
