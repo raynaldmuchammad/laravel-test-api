@@ -1,90 +1,55 @@
-/\*\*
 
-- Brief application documentation
--
-- Summary
--   - This application provides a simple API to create and retrieve a list of users.
--   - Assumed base path: /api
--   - Communication format: JSON (Content-Type: application/json)
--   - Authentication: If required, include header Authorization: Bearer <token>
--
-- Endpoints
--
--   1. POST /api/user/create
-- Description:
--      - Creates a new user.
-- Headers:
--      - Content-Type: application/json
--      - Authorization: Bearer <token>        (optional, depending on implementation)
-- Body (example JSON schema):
--      {
--        "name": "string",        // required
--        "email": "string",       // required, valid email
--        "password": "string",    // required, minimum length according to policy
--        "metadata": { ... }      // optional, object for additional data
--      }
-- Responses:
--      - 201 Created
--        {
--          "id": "string",
--          "name": "string",
--          "email": "string",
--          "created_at": "ISO-8601 timestamp"
--        }
--      - 400 Bad Request
--        { "error": "Validation failed", "details": { ... } }
--      - 409 Conflict
--        { "error": "Email already exists" }
--      - 401 Unauthorized (if endpoint requires a token)
--      - 500 Internal Server Error
-- Notes:
--      - Input validation must be performed (unique email, strong password, etc.).
--      - Do not return the password in the response.
--
--   2. GET /api/users
-- Description:
--      - Retrieves a list of users with support for paging and sorting.
-- Query Parameters:
--      - per_page (integer, optional) : number of items per page. Default: 10
--      - page (integer, optional)     : page number (1-based). Default: 1
--      - sort_order (string, optional): sort direction, common values: "asc" or "desc". Default: "asc"
--        (If needed, add a sort_by parameter to specify the field to sort by, e.g. created_at)
-- Headers:
--      - Accept: application/json
--      - Authorization: Bearer <token>   (optional, depending on implementation)
-- Responses:
--      - 200 OK
--        {
--          "data": [
--            { "id": "string", "name": "string", "email": "string", "created_at": "ISO-8601" },
--            ...
--          ],
--          "meta": {
--            "page": 1,
--            "per_page": 10,
--            "total": 123,
--            "total_pages": 13
--          }
--        }
--      - 400 Bad Request
--        { "error": "Invalid query parameter", "details": { ... } }
--      - 401 Unauthorized (if endpoint requires a token)
--      - 500 Internal Server Error
-- Notes:
--      - Ensure per_page and page values are validated (per_page > 0, page >= 1).
--      - sort_order hanya menentukan arah urutan; tentukan field default (mis. created_at).
--
-- Praktik terbaik
--   - Gunakan kode status HTTP yang tepat.
--   - Sediakan pesan error yang informatif namun tidak bocorkan informasi sensitif.
--   - Batasi ukuran per_page maksimum untuk mencegah permintaan berat.
--   - Terapkan rate limiting dan autentikasi sesuai kebutuhan.
--
-- Contoh singkat
--   - Membuat user (request):
-- POST /api/user/create
-- Body: { "name":"A", "email":"a@example.com", "password":"secret" }
--
--   - Mengambil user halaman 2, 20 per halaman, urut descending:
-- GET /api/users?per_page=20&page=2&sort_order=desc
-  \*/
+# Laravel Test API
+
+Brief application documentation
+
+
+## API Reference
+
+#### Get all User
+
+```http
+  GET /api/users
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `per_page` | `integer` | **Optional**. Item Per Page |
+| `sort_order` | `string` | **Optional**. Order item (asc, desc) |
+| `name` | `string` | **Optional**. Filter by name |
+| `email` | `string` | **Optional**. Filter by email |
+
+#### Create User
+
+```http
+  POST /api/user/create
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `name`      | `string` | **Required**. Name |
+| `email`      | `string` | **Required**. Email |
+| `password`      | `string` | **Required**. Password, min: 8 characters |
+| `role`      | `string` | **Required**. Role |
+
+
+
+
+## Deployment
+
+To run the project follow this step
+
+#### 1. Copy data db config to .env
+```bash
+    docker-compose/pgsql/pgsql.env to .env
+```
+
+#### 2. Maksure docker already active and run this command
+```bash
+  docker compose build --no-orphans; docker compose build --no-cache; docker compose up -d
+```
+
+#### 3. After succcess build open postman and access endpoint
+```bash
+  http://localhost:8011/api
+```
