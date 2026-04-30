@@ -4,9 +4,11 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Override;
 
 class User extends Authenticatable
 {
@@ -21,6 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'active',
     ];
 
     /**
@@ -42,4 +46,32 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    protected $appends = [
+        'order_count',
+        'can_edit',
+    ];
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, "user_id", "id");
+    }
+
+    public function getOrderCountAttribute($value)
+    {
+        return $this->orders()->count();
+    }
+
+    public function getCanEditAttribute($value)
+    {
+        if ($this->role == 'administrator') {
+            return true;
+        } else if ($this->role == 'manager') {
+            return false;
+        } else if ($this->role == 'user') {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -1,4 +1,3 @@
-# version: '3.8'
 services:
   laravel-test-api:
     build:
@@ -6,7 +5,7 @@ services:
         user: laravel-test-api
         uid: 1000
       context: .
-      dockerfile: ./docker_compose/php/dockerfile
+      dockerfile: ./docker-compose/php/dockerfile
     image: laravel-test-api
     container_name: laravel-test-api
     restart: unless-stopped
@@ -23,11 +22,11 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: laravel-test-api-nginx
+    container_name: laravel-api-nginx
     restart: unless-stopped
     volumes:
       - ./:/var/www/html/laravel-test-api
-      - ./docker_compose/nginx:/etc/nginx/conf.d
+      - ./docker-compose/nginx/:/etc/nginx/conf.d/
     networks:
       - laravel-test-api
     ports: # inactive before push to branch
