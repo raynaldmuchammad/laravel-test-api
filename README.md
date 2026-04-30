@@ -9,7 +9,7 @@ To run the project follow this step
 
 #### 1. Copy data db config to .env
 ```bash
-    docker-compose/pgsql/pgsql.env to .env
+  docker-compose/pgsql/pgsql.env to .env
 ```
 
 #### 2. Maksure docker already active and run this command
