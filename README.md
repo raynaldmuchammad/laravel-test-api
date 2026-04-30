@@ -3,6 +3,25 @@
 
 Brief application documentation
 
+## Deployment
+
+To run the project follow this step
+
+#### 1. Copy data db config to .env
+```bash
+    docker-compose/pgsql/pgsql.env to .env
+```
+
+#### 2. Maksure docker already active and run this command
+```bash
+  docker compose build --no-orphans; docker compose build --no-cache; docker compose up -d
+```
+
+#### 3. After succcess build open postman and access endpoint
+```bash
+  http://localhost:8011/api
+```
+
 
 ## API Reference
 
@@ -32,24 +51,3 @@ Brief application documentation
 | `password`      | `string` | **Required**. Password, min: 8 characters |
 | `role`      | `string` | **Required**. Role |
 
-
-
-
-## Deployment
-
-To run the project follow this step
-
-#### 1. Copy data db config to .env
-```bash
-    docker-compose/pgsql/pgsql.env to .env
-```
-
-#### 2. Maksure docker already active and run this command
-```bash
-  docker compose build --no-orphans; docker compose build --no-cache; docker compose up -d
-```
-
-#### 3. After succcess build open postman and access endpoint
-```bash
-  http://localhost:8011/api
-```
